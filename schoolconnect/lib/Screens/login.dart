@@ -48,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               /// 🔴 Top Section
               Container(
-                height: size.height * 0.33,
+                  height: size.height * 0.33,
                 width: size.width,
                 color: MyColor.ColorE83979,
                 child: Stack(
@@ -131,12 +131,12 @@ class _LoginScreenState extends State<LoginScreen> {
             ],
           ),
           hSized30,
-                  Image.asset(
-                    AssetsImages.loginperson,
-                    width: avatarSize,
-                    height: avatarSize,
-                    fit: BoxFit.contain,
-                  ),
+            Image.asset(
+              AssetsImages.loginperson,
+              width: avatarSize,
+              height: avatarSize,
+              fit: BoxFit.contain,
+            ),
           hSized10,
           Text(
             "Sign In Portal",
@@ -200,8 +200,8 @@ class _LoginScreenState extends State<LoginScreen> {
             Consumer<RoleProvider>(
               builder: (context, roleProvider, _) {
                 final isStudent = roleProvider.selectedRole == UserRole.student;
-                        return Padding(
-                          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                return Padding(
+                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -347,8 +347,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   // Sign In Button
                   Center(
-                      child: SizedBox(
-                        width: contentMaxWidth,
+                    child: SizedBox(
+                      width: contentMaxWidth,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: MyColor.color021034,
