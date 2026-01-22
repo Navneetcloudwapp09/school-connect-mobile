@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:schoolconnect/constants/Mycolor.dart';
 import 'package:schoolconnect/constants/imageAssets.dart';
 import 'package:schoolconnect/constants/sizesbox.dart';
@@ -13,6 +14,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
+  late TextEditingController _rollController;
   bool _obscurePassword = true;
 
   @override
@@ -20,18 +22,23 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
+    _rollController = TextEditingController();
   }
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _rollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final contentMaxWidth = math.min(size.width * 0.9, 600.0);
+    final avatarSize = math.min(size.width * 0.14, 120.0);
+    final horizontalPadding = math.min(size.width * 0.06, 40.0);
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -41,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               /// 🔴 Top Section
               Container(
-                height: 288,
+                height: size.height * 0.33,
                 width: size.width,
                 color: MyColor.ColorE83979,
                 child: Stack(
@@ -124,12 +131,12 @@ class _LoginScreenState extends State<LoginScreen> {
             ],
           ),
           hSized30,
-          Image.asset(
-            AssetsImages.loginperson,
-            width: 54,
-            height: 54,
-            fit: BoxFit.contain,
-          ),
+                  Image.asset(
+                    AssetsImages.loginperson,
+                    width: avatarSize,
+                    height: avatarSize,
+                    fit: BoxFit.contain,
+                  ),
           hSized10,
           Text(
             "Sign In Portal",
@@ -153,9 +160,9 @@ class _LoginScreenState extends State<LoginScreen> {
             Consumer<RoleProvider>(
               builder: (context, roleProvider, _) {
                 return Container(
-                  height: 44,
-                  width: 260,
-                  padding: const EdgeInsets.all(4),
+                  height: size.height * 0.06,
+                  width: contentMaxWidth,
+                  padding: EdgeInsets.all(horizontalPadding * 0.25),
                   decoration: BoxDecoration(
                     color: MyColor.colorEEF4FF,
                     borderRadius: BorderRadius.circular(14),
@@ -189,52 +196,63 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             hSized30,
 
-            /// 📧 Email Input Field
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Email',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      hintText: 'Enter your email',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6),
-                        borderSide: BorderSide(color: Color(0xFFE5E7EB)),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6),
-                        borderSide: BorderSide(
-                          color: Color(0xFFE5E7EB),
-                          width: 1,
+            /// 📧 Email / Roll Number Input Field
+            Consumer<RoleProvider>(
+              builder: (context, roleProvider, _) {
+                final isStudent = roleProvider.selectedRole == UserRole.student;
+                        return Padding(
+                          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isStudent ? 'Roll Number' : 'Email',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
                         ),
                       ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6),
-                        borderSide: BorderSide(
-                          color: MyColor.ColorE83979,
-                          width: 1.0,
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: isStudent
+                            ? _rollController
+                            : _emailController,
+                        keyboardType: isStudent
+                            ? TextInputType.text
+                            : TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                          hintText: isStudent
+                              ? 'Enter roll (e.g. 1C-AA-8561)'
+                              : 'Enter your email',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(6),
+                            borderSide: BorderSide(color: Color(0xFFE5E7EB)),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(6),
+                            borderSide: BorderSide(
+                              color: Color(0xFFE5E7EB),
+                              width: 1,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(6),
+                            borderSide: BorderSide(
+                              color: MyColor.ColorE83979,
+                              width: 1.0,
+                            ),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 12,
+                          ),
                         ),
                       ),
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 12,
-                      ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
+                );
+              },
             ),
 
             hSized20,
@@ -329,8 +347,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   // Sign In Button
                   Center(
-                    child: SizedBox(
-                      width: size.width * 0.9,
+                      child: SizedBox(
+                        width: contentMaxWidth,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: MyColor.color021034,
@@ -340,19 +358,57 @@ class _LoginScreenState extends State<LoginScreen> {
                           elevation: 0,
                         ),
                         onPressed: () {
-                          final email = _emailController.text.trim();
+                          final role = context
+                              .read<RoleProvider>()
+                              .selectedRole;
                           final password = _passwordController.text;
-                          // TODO: implement sign-in logic
-                          // temporary placeholder to avoid unused local warnings
-                          if (email.isEmpty || password.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'Please enter email and password',
-                                ),
-                              ),
+
+                          if (role == UserRole.student) {
+                            final roll = _rollController.text.trim();
+                            final rollPattern = RegExp(
+                              r'^[0-9][A-Z]-[A-Z]{2}-[0-9]{4}$',
                             );
-                            return;
+                            if (roll.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Please enter roll number'),
+                                ),
+                              );
+                              return;
+                            }
+                            if (!rollPattern.hasMatch(roll.toUpperCase())) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Invalid roll number. Expected format: 1C-AA-8561',
+                                  ),
+                                ),
+                              );
+                              return;
+                            }
+                          } else {
+                            final email = _emailController.text.trim();
+                            final emailPattern = RegExp(
+                              r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$",
+                            );
+                            if (email.isEmpty || password.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Please enter email and password',
+                                  ),
+                                ),
+                              );
+                              return;
+                            }
+                            if (!emailPattern.hasMatch(email)) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Please enter a valid email'),
+                                ),
+                              );
+                              return;
+                            }
                           }
                         },
                         child: const Text(
