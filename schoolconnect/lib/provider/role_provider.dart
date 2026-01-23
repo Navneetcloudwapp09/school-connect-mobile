@@ -6,7 +6,7 @@ export 'package:flutter/material.dart';
 enum UserRole { admin, teacher, student }
 
 class RoleProvider extends ChangeNotifier {
-  UserRole _selectedRole = UserRole.admin;
+  UserRole _selectedRole = UserRole.teacher;
 
   UserRole get selectedRole => _selectedRole;
 

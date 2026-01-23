@@ -1,8 +1,12 @@
 import 'dart:math' as math;
+import 'dart:convert';
 import 'package:schoolconnect/constants/Mycolor.dart';
+import 'package:schoolconnect/constants/ApiServer.dart';
 import 'package:schoolconnect/constants/imageAssets.dart';
 import 'package:schoolconnect/constants/sizesbox.dart';
 import 'package:schoolconnect/export.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,6 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
   late TextEditingController _passwordController;
   late TextEditingController _rollController;
   bool _obscurePassword = true;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -169,12 +174,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   child: Row(
                     children: [
-                      _roleButton(
-                        context,
-                        title: "Admin",
-                        role: UserRole.admin,
-                        isSelected: roleProvider.selectedRole == UserRole.admin,
-                      ),
+                      // _roleButton(
+                      //   context,
+                      //   title: "Admin",
+                      //   role: UserRole.admin,
+                      //   isSelected: roleProvider.selectedRole == UserRole.admin,
+                      // ),
                       _roleButton(
                         context,
                         title: "Teacher",
@@ -239,7 +244,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(6),
                             borderSide: BorderSide(
-                              color: MyColor.ColorE83979,
+                              color: MyColor.colorEEF4FF,
                               width: 1.0,
                             ),
                           ),
@@ -333,7 +338,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(6),
                         borderSide: BorderSide(
-                          color: MyColor.ColorE83979,
+                          color: MyColor.colorEEF4FF,
                           width: 1.0,
                         ),
                       ),
@@ -357,13 +362,30 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           elevation: 0,
                         ),
-                        onPressed: () {
+                        onPressed: () async {
+                          if (_isLoading) return;
+                          setState(() {
+                            _isLoading = true;
+                          });
+
                           final role = context
                               .read<RoleProvider>()
                               .selectedRole;
-                          final password = _passwordController.text;
+                          final password = _passwordController.text.trim();
+
+                          String url;
+                          if (role == UserRole.teacher) {
+                            url = Apiserver.loginteacher;
+                          } else if (role == UserRole.admin) {
+                            url = Apiserver.baseurl + "/api/admin/auth/login";
+                          } else {
+                            url = Apiserver.baseurl + "/api/student/auth/login";
+                          }
+
+                          Map<String, dynamic> payload;
 
                           if (role == UserRole.student) {
+                            // For students validate roll first, then password
                             final roll = _rollController.text.trim();
                             final rollPattern = RegExp(
                               r'^[0-9][A-Z]-[A-Z]{2}-[0-9]{4}$',
@@ -374,6 +396,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   content: Text('Please enter roll number'),
                                 ),
                               );
+                              setState(() => _isLoading = false);
                               return;
                             }
                             if (!rollPattern.hasMatch(roll.toUpperCase())) {
@@ -384,21 +407,37 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
                               );
+                              setState(() => _isLoading = false);
                               return;
                             }
+                            if (password.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Please enter password'),
+                                ),
+                              );
+                              setState(() => _isLoading = false);
+                              return;
+                            }
+
+                            payload = {
+                              'roll': roll,
+                              'password': password,
+                              'role': 'student',
+                            };
                           } else {
+                            // For Admin/Teacher validate email first, then password
                             final email = _emailController.text.trim();
                             final emailPattern = RegExp(
                               r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$",
                             );
-                            if (email.isEmpty || password.isEmpty) {
+                            if (email.isEmpty) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                  content: Text(
-                                    'Please enter email and password',
-                                  ),
+                                  content: Text('Please enter email'),
                                 ),
                               );
+                              setState(() => _isLoading = false);
                               return;
                             }
                             if (!emailPattern.hasMatch(email)) {
@@ -407,18 +446,131 @@ class _LoginScreenState extends State<LoginScreen> {
                                   content: Text('Please enter a valid email'),
                                 ),
                               );
+                              setState(() => _isLoading = false);
                               return;
                             }
+                            if (password.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Please enter password'),
+                                ),
+                              );
+                              setState(() => _isLoading = false);
+                              return;
+                            }
+
+                            // For Teacher, backend expects only email & password keys.
+                            if (role == UserRole.teacher) {
+                              payload = {'email': email, 'password': password};
+                            } else {
+                              // Admin still sends role along with email/password
+                              payload = {
+                                'email': email,
+                                'password': password,
+                                'role': 'admin',
+                              };
+                            }
+                          }
+
+                          if (role == UserRole.teacher) {
+                            try {
+                              final uri = Uri.parse(url);
+                              final response = await http.post(
+                                uri,
+                                headers: {'Content-Type': 'application/json'},
+                                body: jsonEncode(payload),
+                              );
+                              debugPrint('Response status: ${response.statusCode}');
+                              debugPrint('Response body: ${response.body}');
+                              debugPrint('Response url: ${response.request?.url}');
+
+                              if (response.statusCode >= 200 && response.statusCode < 300) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Login successful'),
+                                  ),
+                                );
+
+                                // Try to extract token from response body and persist session
+                                try {
+                                  final bodyJson = jsonDecode(response.body);
+                                  String? token;
+                                  if (bodyJson is Map) {
+                                    token = bodyJson['token']?.toString() ?? bodyJson['accessToken']?.toString();
+                                    if (token == null && bodyJson['data'] is Map) {
+                                      token = bodyJson['data']['token']?.toString() ?? bodyJson['data']['accessToken']?.toString();
+                                    }
+                                  }
+                                  if (token != null) {
+                                    final prefs = await SharedPreferences.getInstance();
+                                    await prefs.setString('auth_token', token);
+                                    await prefs.setString('user_role', role.toString());
+                                    debugPrint('Saved auth_token: ${token.replaceAll(RegExp(r'.(?!.{4})'), '*')}');
+                                  } else {
+                                    debugPrint('No token found in response');
+                                  }
+                                } catch (e) {
+                                  debugPrint('Token parsing error: $e');
+                                }
+
+                                if (role == UserRole.teacher) {
+                                  Navigator.of(context).pushReplacementNamed('/dashboard');
+                                }
+                                // token persisted (if present)
+                              } else {
+                                String message = 'Login failed';
+                                try {
+                                  final body = jsonDecode(response.body);
+                                  if (body is Map && body['message'] != null) {
+                                    message = body['message'].toString();
+                                  }
+                                } catch (_) {}
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(message)),
+                                );
+                              }
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Network error: $e')),
+                              );
+                            } finally {
+                              setState(() {
+                                _isLoading = false;
+                              });
+                            }
+                          } else {
+                            // Do not call API for Admin/Student — only validate locally
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Login via API is enabled only for Teachers',
+                                ),
+                              ),
+                            );
+                            setState(() {
+                              _isLoading = false;
+                            });
                           }
                         },
-                        child: const Text(
-                          'Sign In',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
+                        child: _isLoading
+                            ? SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
+                                ),
+                              )
+                            : const Text(
+                                'Sign In',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
                       ),
                     ),
                   ),
@@ -466,6 +618,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                         ),
+                        hSized10
                       ],
                     ),
                   ),
