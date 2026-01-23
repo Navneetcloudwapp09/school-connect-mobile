@@ -276,7 +276,10 @@ class TeacherHomePage extends StatelessWidget {
 
           _primaryButton("➕  Take Attendance", svgAsset: AssetsImages.person),
           const SizedBox(height: 10),
-          _primaryButton("  Attendance History", svgAsset: AssetsImages.calendar),
+          _primaryButton(
+            "  Attendance History",
+            svgAsset: AssetsImages.calendar,
+          ),
         ],
       ),
     );
@@ -496,14 +499,16 @@ class TeacherHomePage extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (svgAsset != null) ...[
-              SvgPicture.asset(svgAsset, width: 18, height: 18, color: Colors.white),
+              SvgPicture.asset(
+                svgAsset,
+                width: 18,
+                height: 18,
+                color: Colors.white,
+              ),
               const SizedBox(width: 8),
             ],
             Expanded(
-              child: Text(
-                text,
-                style: const TextStyle(color: Colors.white),
-              ),
+              child: Text(text, style: const TextStyle(color: Colors.white)),
             ),
           ],
         ),
