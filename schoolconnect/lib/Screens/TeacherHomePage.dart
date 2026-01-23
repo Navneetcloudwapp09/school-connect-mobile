@@ -12,13 +12,13 @@ class TeacherHomePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FC),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              /// 🔹 HEADER
-              Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 🔹 HEADER (static, not inside scroll view)
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
                 children: [
                   CircleAvatar(
                     radius: 22,
@@ -66,150 +66,206 @@ class TeacherHomePage extends StatelessWidget {
                   SvgPicture.asset(AssetsImages.bell, width: 24, height: 24),
                 ],
               ),
+            ),
 
-              const SizedBox(height: 20),
-
-              /// 🔹 STATS CARDS (horizontal scroll)
-              SizedBox(
-                height: 111,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    _infoCard(
-                      title: "05",
-                      subtitle: "Today’s Classes",
-                      footer: "3 Complete  2 Remaining",
-                      svgAsset: AssetsImages.person,
-                    ),
-                    const SizedBox(width: 12),
-                    _infoCard(
-                      title: "Pending",
-                      subtitle: "Attendance Status",
-                      footer: "For Class 10A",
-                      svgAsset: AssetsImages.calendar,
-                    ),
-                    const SizedBox(width: 12),
-                    _infoCard(
-                      title: "Pending marks",
-                      subtitle: "02",
-                      footer: "2 subject marks are pending",
-                      svgAsset: AssetsImages.editpage,
-                    ),
-                    const SizedBox(width: 12),
-                    _infoCard(
-                      title: "Next Class",
-                      subtitle: "Physics",
-                      footer: "Start in 15 min, Room(105) in 11thB",
-                      svgAsset: AssetsImages.remainclock,
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 16),
-              _myClassCard(), hSized20,
-
-              /// 🔹 MY CLASS
-              /// 🔹 ASSIGNED SUBJECTS (NEW UI)
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: MyColor.colorD7E3FC, width: 1.5),
-                ),
+            // Scrollable content below the static header
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      "Assigned Subjects",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
+                    const SizedBox(height: 20),
+
+                    /// 🔹 STATS CARDS (horizontal scroll)
+                    SizedBox(
+                      height: 111,
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        children: [
+                          _infoCard(
+                            title: "05",
+                            subtitle: "Today’s Classes",
+                            footer: "3 Complete  2 Remaining",
+                            svgAsset: AssetsImages.person,
+                          ),
+                          const SizedBox(width: 12),
+                          _infoCard(
+                            title: "Pending",
+                            subtitle: "Attendance Status",
+                            footer: "For Class 10A",
+                            svgAsset: AssetsImages.calendar,
+                          ),
+                          const SizedBox(width: 12),
+                          _infoCard(
+                            title: "Pending marks",
+                            subtitle: "02",
+                            footer: "2 subject marks are pending",
+                            svgAsset: AssetsImages.editpage,
+                          ),
+                          const SizedBox(width: 12),
+                          _infoCard(
+                            title: "Next Class",
+                            subtitle: "Physics",
+                            footer: "Start in 15 min, Room(105) in 11thB",
+                            svgAsset: AssetsImages.remainclock,
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      "Manage your teaching assignment and mark entry",
-                      style: TextStyle(color: Colors.grey, fontSize: 13),
-                    ),
+
                     const SizedBox(height: 16),
+                    _myClassCard(), hSized20,
 
-                    _assignedSubjectItem(),
-                    _divider(),
-                    _assignedSubjectItem(),
-                    _divider(),
-                    _assignedSubjectItem(),
-                    _divider(),
-                    _assignedSubjectItem(),
-                  ],
-                ),
-              ),
-
-              hSized20,
-
-              /// 🔹 ASSIGNED SUBJECTS
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: _cardDecoration(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Assigned Subjects",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
+                    /// 🔹 MY CLASS
+                    /// 🔹 ASSIGNED SUBJECTS (NEW UI)
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: MyColor.colorD7E3FC,
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          // Header (padded)
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: const [
+                                Text(
+                                  "Assigned Subjects",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                SizedBox(height: 10),
+                                Text(
+                                  "Manage your teaching assignment and mark entry",
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Divider(
+                            color: MyColor.colorD7E3FC,
+                            thickness: 1,
+                            height: 1,
+                          ),
+                          hSized5,
+                          // Subject rows with full-width dividers between them
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: _assignedSubjectItem(),
+                          ),
+                          const Divider(
+                            color: MyColor.colorD7E3FC,
+                            thickness: 1,
+                            height: 1,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: _assignedSubjectItem(),
+                          ),
+                          const Divider(
+                            color: MyColor.colorD7E3FC,
+                            thickness: 1,
+                            height: 1,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: _assignedSubjectItem(),
+                          ),
+                          const Divider(
+                            color: MyColor.colorD7E3FC,
+                            thickness: 1,
+                            height: 1,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: _assignedSubjectItem(),
+                          ),
+                          // const SizedBox(height: 16),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 6),
-                    const Text(
-                      "Manage your teaching assignment and mark entry",
-                      style: TextStyle(color: Colors.grey, fontSize: 13),
+
+                    hSized20,
+
+                    /// 🔹 ASSIGNED SUBJECTS
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: _cardDecoration(),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Assigned Subjects",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          const Text(
+                            "Manage your teaching assignment and mark entry",
+                            style: TextStyle(color: Colors.grey, fontSize: 13),
+                          ),
+                          const SizedBox(height: 12),
+
+                          _subjectTile(),
+                          _subjectTile(),
+                          _subjectTile(),
+                        ],
+                      ),
                     ),
+
+                    const SizedBox(height: 20),
+
+                    /// 🔹 TODAY’S CLASSES
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Today’s Classes",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: const Color(0xFFEFF4FF),
+                          ),
+                          child: const Text("Tuesday"),
+                        ),
+                      ],
+                    ),
+
                     const SizedBox(height: 12),
 
-                    _subjectTile(),
-                    _subjectTile(),
-                    _subjectTile(),
+                    _classTile(),
+                    _classTile(),
+                    _classTile(),
                   ],
                 ),
               ),
-
-              const SizedBox(height: 20),
-
-              /// 🔹 TODAY’S CLASSES
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    "Today’s Classes",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: const Color(0xFFEFF4FF),
-                    ),
-                    child: const Text("Tuesday"),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 12),
-
-              _classTile(),
-              _classTile(),
-              _classTile(),
-      
-            ],
-          ),
+            ),
+          ],
         ),
-      
       ),
     );
   }
@@ -276,18 +332,19 @@ class TeacherHomePage extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
             child: Column(
               children: [
-                /// Warning
-                Row(
-                  children: const [
-                    Icon(Icons.error_outline, size: 18, color: Colors.red),
-                    SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
+                /// Warning (centered)
+                Center(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(Icons.error_outline, size: 18, color: Colors.red),
+                      SizedBox(width: 6),
+                      Text(
                         "Morning attendance not yet submitted",
                         style: TextStyle(fontSize: 13, color: Colors.grey),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
 
                 const SizedBox(height: 14),
@@ -295,7 +352,7 @@ class TeacherHomePage extends StatelessWidget {
                 _primaryButton("Take Attendance", svgAsset: AssetsImages.plus),
                 const SizedBox(height: 10),
                 _primaryButton(
-                  "  Attendance History",
+                  "Attendance History",
                   svgAsset: AssetsImages.clock,
                 ),
               ],
@@ -308,7 +365,7 @@ class TeacherHomePage extends StatelessWidget {
 
   Widget _assignedSubjectItem() {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(vertical: 15),
       child: Row(
         children: [
           Expanded(
@@ -325,8 +382,16 @@ class TeacherHomePage extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: const Color(0xFFEFF4FF),
                         borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: MyColor.colorD7E3FC)
                       ),
-                      child: const Text("10-A", style: TextStyle(fontSize: 12)),
+                      child: const Text(
+                        "10-A",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: MyColor.black,
+                        ),
+                      ),
                     ),
                     const SizedBox(width: 8),
                     const Text(
@@ -355,14 +420,17 @@ class TeacherHomePage extends StatelessWidget {
 
           OutlinedButton(
             style: OutlinedButton.styleFrom(
-              side: BorderSide(color: Colors.blue.shade200),
+              side: BorderSide(color: MyColor.colorD7E3FC),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
             onPressed: () {},
-            child: const Text("View Students"),
-          ),
+            child: Text(
+              "View Students",
+              style: TextStyle(color: MyColor.black),
+            ),
+          )
         ],
       ),
     );
@@ -523,8 +591,8 @@ class TeacherHomePage extends StatelessWidget {
             if (svgAsset != null) ...[
               SvgPicture.asset(
                 svgAsset,
-                width: 18,
-                height: 18,
+                width: 15,
+                height: 12,
                 color: Colors.white,
               ),
               const SizedBox(width: 8),
