@@ -4,8 +4,15 @@ import 'package:schoolconnect/constants/Mycolor.dart';
 import 'package:schoolconnect/constants/imageAssets.dart';
 import 'package:schoolconnect/constants/sizesbox.dart';
 
-class TeacherHomePage extends StatelessWidget {
+class TeacherHomePage extends StatefulWidget {
   const TeacherHomePage({super.key});
+
+  @override
+  _TeacherHomePageState createState() => _TeacherHomePageState();
+}
+
+class _TeacherHomePageState extends State<TeacherHomePage> {
+  int _selectedTodayIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -129,18 +136,22 @@ class TeacherHomePage extends StatelessWidget {
                         ),
                       ),
                       child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // Header (padded)
                           Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                            padding: const EdgeInsets.fromLTRB(16, 16, 0, 12),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: const [
                                 Text(
                                   "Assigned Subjects",
                                   style: TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.w600,
+                                    fontFamily: 'Roboto',
                                   ),
                                 ),
                                 SizedBox(height: 10),
@@ -201,65 +212,61 @@ class TeacherHomePage extends StatelessWidget {
                     hSized20,
 
                     /// 🔹 ASSIGNED SUBJECTS
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: _cardDecoration(),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            "Assigned Subjects",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          const Text(
-                            "Manage your teaching assignment and mark entry",
-                            style: TextStyle(color: Colors.grey, fontSize: 13),
-                          ),
-                          const SizedBox(height: 12),
+                    // Container(
+                    //   padding: const EdgeInsets.all(14),
+                    //   decoration: _cardDecoration(),
+                    //   child: Column(
+                    //     crossAxisAlignment: CrossAxisAlignment.start,
+                    //     children: [
+                    //       const Text(
+                    //         "Assigned Subjects",
+                    //         style: TextStyle(
+                    //           fontSize: 16,
+                    //           fontWeight: FontWeight.w600,
+                    //         ),
+                    //       ),
+                    //       const SizedBox(height: 6),
+                    //       const Text(
+                    //         "Manage your teaching assignment and mark entry",
+                    //         style: TextStyle(color: Colors.grey, fontSize: 13),
+                    //       ),
+                    //       const SizedBox(height: 12),
 
-                          _subjectTile(),
-                          _subjectTile(),
-                          _subjectTile(),
-                        ],
-                      ),
-                    ),
-
+                    //       _subjectTile(),
+                    //       _subjectTile(),
+                    //       _subjectTile(),
+                    //     ],
+                    //   ),
+                    // ),
+                    _todaysClassesCard(),
                     const SizedBox(height: 20),
 
                     /// 🔹 TODAY’S CLASSES
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "Today’s Classes",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: const Color(0xFFEFF4FF),
-                          ),
-                          child: const Text("Tuesday"),
-                        ),
-                      ],
-                    ),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //   children: [
+                    //     const Text(
+                    //       "Today’s Classes",
+                    //       style: TextStyle(
+                    //         fontSize: 16,
+                    //         fontWeight: FontWeight.w600,
+                    //       ),
+                    //     ),
+                    //     Container(
+                    //       padding: const EdgeInsets.symmetric(
+                    //         horizontal: 12,
+                    //         vertical: 6,
+                    //       ),
+                    //       decoration: BoxDecoration(
+                    //         borderRadius: BorderRadius.circular(20),
+                    //         color: const Color(0xFFEFF4FF),
+                    //       ),
+                    //       child: const Text("Tuesday"),
+                    //     ),
+                    //   ],
+                    // ),
 
-                    const SizedBox(height: 12),
-
-                    _classTile(),
-                    _classTile(),
-                    _classTile(),
+                   
                   ],
                 ),
               ),
@@ -533,6 +540,126 @@ class TeacherHomePage extends StatelessWidget {
       ),
     );
   }
+Widget _todaysClassesCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: MyColor.colorD7E3FC, width: 1.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// Header
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  "Today’s Classes",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEFF4FF),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Text("Tuesday", style: TextStyle(fontSize: 12)),
+                ),
+              ],
+            ),
+          ),
+
+          const Divider(color: MyColor.colorD7E3FC, thickness: 1, height: 1),
+
+          /// Class list (ListView.builder, 5 items)
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: 5,
+            itemBuilder: (context, index) {
+              final selected = _selectedTodayIndex == index;
+              return Column(
+                children: [
+                  GestureDetector(
+                    onTap: () => setState(() => _selectedTodayIndex = index),
+                    child: _todayClassItem(index: index, selected: selected),
+                  ),
+                  if (index < 4)
+                    const Divider(color: MyColor.colorD7E3FC, height: 1),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _todayClassItem({required int index, required bool selected}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          /// Left indicator (visible only when selected)
+          selected
+              ? Container(
+                  width: 4,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                )
+              : const SizedBox(width: 4, height: 42),
+          const SizedBox(width: 12),
+
+          /// Subject + time
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Mathematics",
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: const [
+                    Icon(Icons.access_time, size: 14, color: Colors.grey),
+                    SizedBox(width: 4),
+                    Text(
+                      "8:00 - 8:30",
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          /// Room chip
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: const Color(0xFFEFF4FF),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Text("Room 204", style: TextStyle(fontSize: 12)),
+          ),
+        ],
+      ),
+    );
+  }
+
 
   Widget _classTile() {
     return Container(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:schoolconnect/Screens/MySubjectScreen.dart';
 import 'package:schoolconnect/Screens/TeacherHomePage.dart';
+import 'package:schoolconnect/constants/Mycolor.dart';
 
 class TeacherBottomNav extends StatefulWidget {
   const TeacherBottomNav({super.key});
@@ -22,6 +23,7 @@ class _TeacherBottomNavState extends State<TeacherBottomNav> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: MyColor.white,
       body: _screens[_currentIndex],
 
       bottomNavigationBar: BottomNavigationBar(
@@ -34,6 +36,7 @@ class _TeacherBottomNavState extends State<TeacherBottomNav> {
         type: BottomNavigationBarType.fixed,
         selectedItemColor: const Color(0xFF0A1A3A),
         unselectedItemColor: Colors.grey,
+        backgroundColor: MyColor.white,
         showUnselectedLabels: true,
         items: const [
           BottomNavigationBarItem(
