@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'AttendanceHistoryScreen.dart';
 
 enum AttendanceStatus { none, present, absent, leave }
 
@@ -154,6 +155,15 @@ class _TakeAttendanceScreenState extends State<TakeAttendanceScreen> {
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.history, color: Colors.grey),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const AttendanceHistoryScreen(),
+              ),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.info_outline, color: Colors.grey),
             onPressed: () {},

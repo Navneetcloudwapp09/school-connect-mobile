@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:schoolconnect/Screens/TakeAttendanceScreen.dart';
+import 'package:schoolconnect/Screens/AttendanceHistoryScreen.dart';
 import 'package:schoolconnect/constants/Mycolor.dart';
 import 'package:schoolconnect/constants/imageAssets.dart';
 import 'package:schoolconnect/constants/sizesbox.dart';
@@ -392,6 +393,9 @@ class _TeacherHomePageState extends State<TeacherHomePage> {
                 _primaryButton(
                   "Attendance History",
                   svgAsset: AssetsImages.clock,
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const AttendanceHistoryScreen()));
+                  },
                 ),
               ],
             ),
@@ -734,7 +738,7 @@ Widget _todaysClassesCard() {
     );
   }
 
-  Widget _primaryButton(String text, {String? svgAsset}) {
+  Widget _primaryButton(String text, {String? svgAsset, VoidCallback? onPressed}) {
     return SizedBox(
       width: double.infinity,
       height: 44,
@@ -745,7 +749,7 @@ Widget _todaysClassesCard() {
             borderRadius: BorderRadius.circular(10),
           ),
         ),
-        onPressed: () {
+        onPressed: onPressed ?? () {
           Navigator.push(
             context,
             MaterialPageRoute(
