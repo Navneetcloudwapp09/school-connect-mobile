@@ -20,23 +20,29 @@ class _TeacherHomePageState extends State<TeacherHomePage> {
   @override
   void initState() {
     super.initState();
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Color(0xFF021034), // Android
-        statusBarIconBrightness: Brightness.light,
-        statusBarBrightness: Brightness.dark, // iOS
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final double topPadding = MediaQuery.of(context).padding.top;
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FC),
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      body: Column(
+        children: [
+          // Paint the status-bar area on iOS so it matches the header color
+          AnnotatedRegion<SystemUiOverlayStyle>(
+            value: const SystemUiOverlayStyle(
+              statusBarIconBrightness: Brightness.light,
+              statusBarBrightness: Brightness.dark,
+            ),
+            child: Container(height: topPadding, color: const Color(0xFF021034)),
+          ),
+          Expanded(
+            child: SafeArea(
+              top: false,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
             // 🔹 HEADER (static, not inside scroll view)
             Container(
               width: double.infinity,
@@ -306,7 +312,7 @@ class _TeacherHomePageState extends State<TeacherHomePage> {
           ],
         ),
       ),
-    );
+    )]));
   }
 
   Widget _divider() {
