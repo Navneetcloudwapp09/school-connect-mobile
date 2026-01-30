@@ -53,7 +53,7 @@ class _TakeAttendanceScreenState extends State<TakeAttendanceScreen> {
                     Container(
                       width: MediaQuery.of(context).size.width * 0.86,
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
+                        horizontal: 0,
                         vertical: 26,
                       ),
                       decoration: BoxDecoration(
@@ -90,33 +90,22 @@ class _TakeAttendanceScreenState extends State<TakeAttendanceScreen> {
                             AppStrings.attendanceSavedTitle,
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                           const SizedBox(height: 10),
                           const Text(
                             AppStrings.attendanceSavedMessage,
                             textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.grey, fontSize: 13),
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
                           const SizedBox(height: 6),
                         ],
-                      ),
-                    ),
-                    Positioned(
-                      right: MediaQuery.of(context).size.width * 0.07,
-                      top: MediaQuery.of(context).size.height * 0.29,
-                      child: GestureDetector(
-                        onTap: () => Navigator.of(context).maybePop(),
-                        child: Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.close, size: 18),
-                        ),
                       ),
                     ),
                   ],
