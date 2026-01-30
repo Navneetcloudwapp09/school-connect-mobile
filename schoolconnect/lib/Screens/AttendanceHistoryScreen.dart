@@ -49,10 +49,11 @@ class AttendanceHistoryScreen extends StatelessWidget {
   Widget _statusPill(String status) {
     final bool complete = status.toLowerCase() == 'complete';
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      height: 25,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
       decoration: BoxDecoration(
         color: complete ? const Color(0xFFE8FBEE) : const Color(0xFFFFF6EA),
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: complete ? const Color(0xFF16A34A) : const Color(0xFFF59E0B),
         ),
@@ -62,6 +63,7 @@ class AttendanceHistoryScreen extends StatelessWidget {
         style: TextStyle(
           color: complete ? const Color(0xFF16A34A) : const Color(0xFFF59E0B),
           fontWeight: FontWeight.w600,
+          fontSize: 14,
         ),
       ),
     );
@@ -71,7 +73,7 @@ class AttendanceHistoryScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFFF7FBFF),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: const Color(0xFFEAF1FF)),
       ),
@@ -283,7 +285,6 @@ class AttendanceHistoryScreen extends StatelessWidget {
                       ),
                     ),
                     const Divider(height: 12, color: Color(0xFFEAF1FF)),
-                    const SizedBox(height: 12),
 
                     Expanded(
                       child: ListView.separated(
@@ -295,50 +296,63 @@ class AttendanceHistoryScreen extends StatelessWidget {
                         itemBuilder: (context, index) {
                           final r = _records[index];
                           final status = r['status'] as String;
-                          return ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 0,
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 15,
+                              vertical: 8,
                             ),
-                            title: Text(
-                              r['date'] as String,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            subtitle: Padding(
-                              padding: const EdgeInsets.only(top: 6),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    r['day'] as String,
-                                    style: const TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  _countPill(
-                                    r['present'] as int,
-                                    r['absent'] as int,
-                                    r['leave'] as int,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                _statusPill(status),
-                                const SizedBox(width: 10),
-                                const Icon(
-                                  Icons.chevron_right,
-                                  color: Colors.grey,
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            r['date'] as String,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+
+                                          _statusPill(status),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        r['day'] as String,
+                                        style: const TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 5),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          _countPill(
+                                            r['present'] as int,
+                                            r['absent'] as int,
+                                            r['leave'] as int,
+                                          ),
+                                          const Icon(
+                                            Icons.chevron_right,
+                                            color: MyColor.color737373,
+                                            size: 25,
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
-                            onTap: () {},
                           );
                         },
                       ),

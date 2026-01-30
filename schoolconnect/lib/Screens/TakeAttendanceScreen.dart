@@ -1,11 +1,5 @@
 import 'dart:ui';
-
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:schoolconnect/constants/Mycolor.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'AttendanceHistoryScreen.dart';
 import 'package:schoolconnect/export.dart';
-import 'package:schoolconnect/constants/strings.dart';
 
 enum AttendanceStatus { none, present, absent, leave }
 
@@ -327,7 +321,7 @@ class _TakeAttendanceScreenState extends State<TakeAttendanceScreen> {
                           return Container(
                             padding: const EdgeInsets.symmetric(
                               vertical: 8,
-                              horizontal: 5,
+                              horizontal: 12,
                             ),
                             decoration: BoxDecoration(
                               color: Colors.white,
