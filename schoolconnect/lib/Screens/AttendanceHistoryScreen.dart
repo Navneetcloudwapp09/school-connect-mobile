@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:schoolconnect/export.dart';
 
 class AttendanceHistoryScreen extends StatelessWidget {
   const AttendanceHistoryScreen({super.key});
@@ -154,20 +154,29 @@ class AttendanceHistoryScreen extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+              // height: 89,
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: const Color(0xFFEAF1FF)),
+                border: Border.all(color: MyColor.colorD7E3FC, width: 1.2),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color.fromRGBO(0, 0, 0, 0.04),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: const [
                       Text(
-                        'Class 10 - Section A',
+                        AppStrings.classTitle,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
@@ -175,81 +184,105 @@ class AttendanceHistoryScreen extends StatelessWidget {
                       ),
                       SizedBox(height: 6),
                       Text(
-                        'Monday, Oct 23.',
+                        AppStrings.classDate,
                         style: TextStyle(color: Colors.grey, fontSize: 13),
                       ),
                     ],
                   ),
                   Container(
+                    height: 24,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
-                      vertical: 6,
+                      vertical: 0,
                     ),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: const Color(0xFFEAF1FF)),
+                      border: Border.all(color: MyColor.colorD7E3FC, width: 1),
                     ),
-                    child: const Text(
-                      'Science',
-                      style: TextStyle(
-                        color: Color(0xFF3B6EF6),
-                        fontWeight: FontWeight.w600,
+                    child: Center(
+                      child: const Text(
+                        AppStrings.subjectScience,
+                        style: TextStyle(
+                          color: MyColor.myblack,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-
-            const SizedBox(height: 16),
-
+            hSized16,
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: const Color(0xFFEAF1FF)),
+                  border: Border.all(color: MyColor.colorD7E3FC, width: 1.2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color.fromRGBO(0, 0, 0, 0.04),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-                padding: const EdgeInsets.all(12),
                 child: Column(
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text(
-                              'Recent Records',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
+                    Container(
+                      height: 85,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 18,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Recent Records',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: 'Roboto',
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 2),
-                            Text(
-                              'last 7 Days attendance Summary',
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 12,
+                              Row(
+                                children: [
+                                  Text(
+                                    'Select Date',
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Icon(
+                                    LucideIcons.calendar,
+                                    color: Colors.grey,
+                                    size: 15,
+                                  ),
+                                ],
                               ),
+                            ],
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            'last 7 Days attendance Summary',
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
                             ),
-                          ],
-                        ),
-                        Row(
-                          children: const [
-                            Text(
-                              'Select Date',
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                            SizedBox(width: 8),
-                            Icon(Icons.calendar_today, color: Colors.grey),
-                          ],
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
                     ),
-
+                    const Divider(height: 12, color: Color(0xFFEAF1FF)),
                     const SizedBox(height: 12),
 
                     Expanded(
@@ -257,13 +290,15 @@ class AttendanceHistoryScreen extends StatelessWidget {
                         itemCount: _records.length,
                         separatorBuilder: (context, index) =>
                             const Divider(height: 12, color: Color(0xFFEAF1FF)),
+                        padding: const EdgeInsets.symmetric(vertical: 0),
+
                         itemBuilder: (context, index) {
                           final r = _records[index];
                           final status = r['status'] as String;
                           return ListTile(
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 8,
-                              vertical: 8,
+                              vertical: 0,
                             ),
                             title: Text(
                               r['date'] as String,
@@ -308,15 +343,14 @@ class AttendanceHistoryScreen extends StatelessWidget {
                         },
                       ),
                     ),
-
-                    const SizedBox(height: 8),
-                    const Text(
-                      'End of recent history. Detailed records available in reports',
-                      style: TextStyle(color: Colors.grey, fontSize: 12),
-                    ),
                   ],
                 ),
               ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'End of recent history. Detailed records available in reports',
+              style: TextStyle(color: Colors.grey, fontSize: 12),
             ),
           ],
         ),

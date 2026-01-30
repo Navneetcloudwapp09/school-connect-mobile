@@ -204,8 +204,9 @@ class _TakeAttendanceScreenState extends State<TakeAttendanceScreen> {
                       Text(
                         AppStrings.classTitle,
                         style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Roboto',
                         ),
                       ),
                       SizedBox(height: 6),
@@ -226,19 +227,20 @@ class _TakeAttendanceScreenState extends State<TakeAttendanceScreen> {
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(color: MyColor.colorD7E3FC, width: 1),
                     ),
-                    child: const Text(
-                      AppStrings.subjectScience,
-                      style: TextStyle(
-                        color: MyColor.myblack,
-                        fontWeight: FontWeight.w600,
+                    child: Center(
+                      child: const Text(
+                        AppStrings.subjectScience,
+                        style: TextStyle(
+                          color: MyColor.myblack,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-
-            const SizedBox(height: 16),
+            hSized16,
 
             // Student list card
             Expanded(
@@ -246,54 +248,72 @@ class _TakeAttendanceScreenState extends State<TakeAttendanceScreen> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: const Color(0xFFEAF1FF)),
+                  border: Border.all(color: MyColor.colorD7E3FC, width: 1.2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color.fromRGBO(0, 0, 0, 0.04),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-                padding: const EdgeInsets.all(12),
+                // padding: const EdgeInsets.all(12),
                 child: Column(
                   children: [
                     // header
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              AppStrings.studentListTitle,
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                fontFamily: 'Roboto',
-                              ),
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                  AppStrings.rollNo,
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 18,
+                      ),
+                      height: 85,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                AppStrings.studentListTitle,
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: 'Roboto',
                                 ),
-                                SizedBox(width: 8),
-                                Icon(LucideIcons.filter, color: Colors.grey),
-                              ],
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 2),
-                        Text(
-                          AppStrings.studentListSubtitle,
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    AppStrings.rollNo,
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Icon(
+                                    LucideIcons.filter,
+                                    color: Colors.grey,
+                                    size: 15,
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
+                          SizedBox(height: 2),
+                          Text(
+                            AppStrings.studentListSubtitle,
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-
+                    const Divider(height: 12, color: Color(0xFFEAF1FF)),
                     const SizedBox(height: 12),
 
                     // students list
@@ -335,7 +355,7 @@ class _TakeAttendanceScreenState extends State<TakeAttendanceScreen> {
                                         style: const TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w500,
-                                          color: MyColor.myblack
+                                          color: MyColor.myblack,
                                         ),
                                       ),
                                       const SizedBox(height: 4),
@@ -344,7 +364,7 @@ class _TakeAttendanceScreenState extends State<TakeAttendanceScreen> {
                                         style: const TextStyle(
                                           color: Colors.grey,
                                           fontSize: 12,
-                                          fontWeight: FontWeight.w400
+                                          fontWeight: FontWeight.w400,
                                         ),
                                       ),
                                     ],
@@ -391,7 +411,7 @@ class _TakeAttendanceScreenState extends State<TakeAttendanceScreen> {
                                                   status ==
                                                       AttendanceStatus.present
                                                   ? const Color(0xFF16A34A)
-                                                  : MyColor.transparent
+                                                  : MyColor.transparent,
                                             ),
                                           ),
                                           child: Icon(
@@ -613,7 +633,7 @@ class _TakeAttendanceScreenState extends State<TakeAttendanceScreen> {
             const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+              children: const [
                 Icon(Icons.info_outline, size: 16, color: Colors.grey),
                 SizedBox(width: 6),
                 Text(
