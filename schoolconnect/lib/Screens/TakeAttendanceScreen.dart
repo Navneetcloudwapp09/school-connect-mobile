@@ -1,5 +1,8 @@
 import 'dart:ui';
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:schoolconnect/export.dart';
+import 'package:schoolconnect/model.dart/teacherclass.dart';
 
 enum AttendanceStatus { none, present, absent, leave }
 
@@ -11,11 +14,8 @@ class TakeAttendanceScreen extends StatefulWidget {
 }
 
 class _TakeAttendanceScreenState extends State<TakeAttendanceScreen> {
-  static const int studentCount = 8;
-  final List<AttendanceStatus> _statuses = List.filled(
-    studentCount,
-    AttendanceStatus.none,
-  );
+  List<AttendanceStatus> _statuses = [];
+  List<Student> _students = [];
   List<AttendanceStatus>? _savedStatuses;
   bool _isSaved = false;
 
@@ -118,6 +118,48 @@ class _TakeAttendanceScreenState extends State<TakeAttendanceScreen> {
     );
   }
 
+  void _syncFromProvider() {
+    final prov = context.read<TeacherProvider>();
+    final students = prov.teacherClass?.students ?? [];
+    // if same ids, no change
+    final prevIds = _students.map((s) => s.id).toList();
+    final newIds = students.map((s) => s.id).toList();
+    if (listEquals(prevIds, newIds)) return;
+    final newStatuses = List<AttendanceStatus>.filled(
+      students.length,
+      AttendanceStatus.none,
+    );
+    for (var i = 0; i < students.length && i < _statuses.length; i++) {
+      newStatuses[i] = _statuses[i];
+    }
+    setState(() {
+      _students = students;
+      _statuses = newStatuses;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Fetch teacher class and attendance data
+      context.read<TeacherProvider>().fetchTeacherClass().then(
+        (_) => _syncFromProvider(),
+      );
+      // listen for future updates
+      context.read<TeacherProvider>().addListener(_syncFromProvider);
+    });
+  }
+
+  @override
+  void dispose() {
+    // remove provider listener
+    try {
+      context.read<TeacherProvider>().removeListener(_syncFromProvider);
+    } catch (_) {}
+    super.dispose();
+  }
+
   int get _presentCount =>
       _statuses.where((s) => s == AttendanceStatus.present).length;
   int get _absentCount =>
@@ -183,17 +225,25 @@ class _TakeAttendanceScreenState extends State<TakeAttendanceScreen> {
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
-                        AppStrings.classTitle,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: 'Roboto',
-                        ),
+                    children: [
+                      Consumer<TeacherProvider>(
+                        builder: (context, prov, _) {
+                          final ci = prov.teacherClass?.classInfo;
+                          final title = ci != null
+                              ? 'Class ${ci.name} - Section ${ci.section}'
+                              : AppStrings.classTitle;
+                          return Text(
+                            title,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'Roboto',
+                            ),
+                          );
+                        },
                       ),
-                      SizedBox(height: 6),
-                      Text(
+                      const SizedBox(height: 6),
+                      const Text(
                         AppStrings.classDate,
                         style: TextStyle(color: Colors.grey, fontSize: 13),
                       ),
@@ -299,196 +349,221 @@ class _TakeAttendanceScreenState extends State<TakeAttendanceScreen> {
                     const Divider(height: 12, color: Color(0xFFEAF1FF)),
                     const SizedBox(height: 12),
 
-                    // students list
+                    // students list (dynamic from TeacherProvider)
                     Expanded(
-                      child: ListView.separated(
-                        itemCount: _statuses.length,
-                        separatorBuilder: (context, index) =>
-                            const Divider(height: 12, color: Color(0xFFEAF1FF)),
-                        itemBuilder: (context, index) {
-                          final status = _statuses[index];
-                          return Container(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 8,
-                              horizontal: 12,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Row(
-                              children: [
-                                CircleAvatar(
-                                  radius: 22,
-                                  backgroundColor: Color(0xFFEAF1FF),
-                                  child: Image.asset(
-                                    AssetsImages.loginperson,
-                                    width: 49,
-                                    height: 47,
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Rajbir Bhangi',
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color: MyColor.myblack,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        '${AppStrings.rollNo} 0${index + 1}',
-                                        style: const TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                      child: Consumer<TeacherProvider>(
+                        builder: (context, prov, _) {
+                          if (prov.loading) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                          if (prov.error != null) {
+                            return Center(child: Text(prov.error!));
+                          }
+                          final students = prov.teacherClass?.students ?? [];
+                          if (students.isEmpty) {
+                            return const Center(
+                              child: Text('No students available'),
+                            );
+                          }
 
-                                // action pill
-                                Container(
-                                  height: 44,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFEFF4FF),
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                      color: const Color(0xFFD7E3FC),
-                                    ),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      // present
-                                      GestureDetector(
-                                        onTap: () => _setStatus(
-                                          index,
-                                          AttendanceStatus.present,
-                                        ),
-                                        child: Container(
-                                          width: 36,
-                                          height: 32,
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                            color:
-                                                status ==
-                                                    AttendanceStatus.present
-                                                ? MyColor.color16A34A
-                                                : Colors.transparent,
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                            border: Border.all(
-                                              color:
-                                                  status ==
-                                                      AttendanceStatus.present
-                                                  ? MyColor.color16A34A
-                                                  : MyColor.transparent,
-                                            ),
-                                          ),
-                                          child: Icon(
-                                            Icons.check,
-                                            color:
-                                                status ==
-                                                    AttendanceStatus.present
-                                                ? Colors.white
-                                                : Colors.grey,
-                                            size: 18,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      // absent
-                                      GestureDetector(
-                                        onTap: () => _setStatus(
-                                          index,
-                                          AttendanceStatus.absent,
-                                        ),
-                                        child: Container(
-                                          width: 36,
-                                          height: 32,
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                            color:
-                                                status ==
-                                                    AttendanceStatus.absent
-                                                ? MyColor.colorE11D48
-                                                : Colors.transparent,
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                            border: Border.all(
-                                              color:
-                                                  status ==
-                                                      AttendanceStatus.absent
-                                                  ? MyColor.colorE11D48
-                                                  : MyColor.transparent,
-                                            ),
-                                          ),
-                                          child: Icon(
-                                            Icons.close,
-                                            color:
-                                                status ==
-                                                    AttendanceStatus.absent
-                                                ? Colors.white
-                                                : Colors.grey,
-                                            size: 18,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      // leave
-                                      GestureDetector(
-                                        onTap: () => _setStatus(
-                                          index,
-                                          AttendanceStatus.leave,
-                                        ),
-                                        child: Container(
-                                          width: 36,
-                                          height: 32,
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                            color:
-                                                status == AttendanceStatus.leave
-                                                ? MyColor.colorF59E0B
-                                                : Colors.transparent,
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                            border: Border.all(
-                                              color:
-                                                  status ==
-                                                      AttendanceStatus.leave
-                                                  ? MyColor.colorF59E0B
-                                                  : MyColor.transparent,
-                                            ),
-                                          ),
-                                          child: Icon(
-                                            Icons.access_time,
-                                            color:
-                                                status == AttendanceStatus.leave
-                                                ? Colors.white
-                                                : Colors.grey,
-                                            size: 18,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
+                          if (_statuses.length != students.length) {
+                            WidgetsBinding.instance.addPostFrameCallback(
+                              (_) => _syncFromProvider(),
+                            );
+                          }
+
+                          return ListView.separated(
+                            itemCount: students.length,
+                            separatorBuilder: (context, index) => const Divider(
+                              height: 12,
+                              color: Color(0xFFEAF1FF),
                             ),
+                            itemBuilder: (context, index) {
+                              final status = index < _statuses.length
+                                  ? _statuses[index]
+                                  : AttendanceStatus.none;
+                              final s = students[index];
+                              return Container(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8,
+                                  horizontal: 12,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.transparent,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Row(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 22,
+                                      backgroundColor: const Color(0xFFEAF1FF),
+                                      backgroundImage: s.photoUrl.isNotEmpty
+                                          ? NetworkImage(s.photoUrl)
+                                          : AssetImage(AssetsImages.loginperson)
+                                                as ImageProvider,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            s.name,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              color: MyColor.myblack,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            '${AppStrings.rollNo} ${s.rollNo}',
+                                            style: const TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Container(
+                                      height: 44,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFEFF4FF),
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(
+                                          color: const Color(0xFFD7E3FC),
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () => _setStatus(
+                                              index,
+                                              AttendanceStatus.present,
+                                            ),
+                                            child: Container(
+                                              width: 36,
+                                              height: 32,
+                                              alignment: Alignment.center,
+                                              decoration: BoxDecoration(
+                                                color:
+                                                    status ==
+                                                        AttendanceStatus.present
+                                                    ? MyColor.color16A34A
+                                                    : Colors.transparent,
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                                border: Border.all(
+                                                  color:
+                                                      status ==
+                                                          AttendanceStatus
+                                                              .present
+                                                      ? MyColor.color16A34A
+                                                      : MyColor.transparent,
+                                                ),
+                                              ),
+                                              child: Icon(
+                                                Icons.check,
+                                                color:
+                                                    status ==
+                                                        AttendanceStatus.present
+                                                    ? Colors.white
+                                                    : Colors.grey,
+                                                size: 18,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          GestureDetector(
+                                            onTap: () => _setStatus(
+                                              index,
+                                              AttendanceStatus.absent,
+                                            ),
+                                            child: Container(
+                                              width: 36,
+                                              height: 32,
+                                              alignment: Alignment.center,
+                                              decoration: BoxDecoration(
+                                                color:
+                                                    status ==
+                                                        AttendanceStatus.absent
+                                                    ? MyColor.colorE11D48
+                                                    : Colors.transparent,
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                                border: Border.all(
+                                                  color:
+                                                      status ==
+                                                          AttendanceStatus
+                                                              .absent
+                                                      ? MyColor.colorE11D48
+                                                      : MyColor.transparent,
+                                                ),
+                                              ),
+                                              child: Icon(
+                                                Icons.close,
+                                                color:
+                                                    status ==
+                                                        AttendanceStatus.absent
+                                                    ? Colors.white
+                                                    : Colors.grey,
+                                                size: 18,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          GestureDetector(
+                                            onTap: () => _setStatus(
+                                              index,
+                                              AttendanceStatus.leave,
+                                            ),
+                                            child: Container(
+                                              width: 36,
+                                              height: 32,
+                                              alignment: Alignment.center,
+                                              decoration: BoxDecoration(
+                                                color:
+                                                    status ==
+                                                        AttendanceStatus.leave
+                                                    ? MyColor.colorF59E0B
+                                                    : Colors.transparent,
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                                border: Border.all(
+                                                  color:
+                                                      status ==
+                                                          AttendanceStatus.leave
+                                                      ? MyColor.colorF59E0B
+                                                      : MyColor.transparent,
+                                                ),
+                                              ),
+                                              child: Icon(
+                                                Icons.access_time,
+                                                color:
+                                                    status ==
+                                                        AttendanceStatus.leave
+                                                    ? Colors.white
+                                                    : Colors.grey,
+                                                size: 18,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
                           );
                         },
                       ),
@@ -568,7 +643,7 @@ class _TakeAttendanceScreenState extends State<TakeAttendanceScreen> {
                     ],
                   ),
                   Text(
-                    '${studentCount.toString().padLeft(2, '0')}',
+                    '${_students.length.toString().padLeft(2, '0')}',
                     style: const TextStyle(color: Colors.grey),
                   ),
                 ],

@@ -7,6 +7,7 @@ class AppProviders {
       providers: [
         ChangeNotifierProvider(create: (_) => RoleProvider()),
         ChangeNotifierProvider(create: (_) => AttendanceProvider()),
+        ChangeNotifierProvider(create: (_) => TeacherProvider()),
       ],
       child: child,
     );
