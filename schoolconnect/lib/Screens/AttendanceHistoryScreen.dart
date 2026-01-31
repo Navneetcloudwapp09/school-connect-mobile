@@ -107,6 +107,12 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final provAll = context.watch<AttendanceProvider>();
+    final daysCount = provAll.attendances
+        .map((a) => a.date ?? '')
+        .toSet()
+        .where((d) => d.isNotEmpty)
+        .length;
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FC),
       appBar: AppBar(
@@ -251,7 +257,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                           ),
                           SizedBox(height: 2),
                           Text(
-                            'last 7 Days attendance Summary',
+                            'last $daysCount Day${daysCount == 1 ? '' : 's'} attendance Summary',
                             style: TextStyle(
                               color: Colors.grey,
                               fontSize: 12,
