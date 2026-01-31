@@ -61,8 +61,8 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
               Container(
                 width: 8,
                 height: 8,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF16A34A),
+                decoration: BoxDecoration(
+                  color: MyColor.color16A34A,
                   shape: BoxShape.circle,
                 ),
               ),
@@ -76,8 +76,8 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
               Container(
                 width: 8,
                 height: 8,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFE30B5C),
+                decoration: BoxDecoration(
+                  color: MyColor.colorE11D48,
                   shape: BoxShape.circle,
                 ),
               ),
@@ -91,8 +91,8 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
               Container(
                 width: 8,
                 height: 8,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF59E0B),
+                decoration: BoxDecoration(
+                  color: MyColor.colorF59E0B,
                   shape: BoxShape.circle,
                 ),
               ),
@@ -379,8 +379,8 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                                           const SizedBox(height: 2),
                                           Text(
                                             dayString,
-                                            style: const TextStyle(
-                                              color: Colors.grey,
+                                            style: TextStyle(
+                                              color: MyColor.color64748B,
                                               fontSize: 12,
                                             ),
                                           ),

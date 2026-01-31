@@ -384,7 +384,7 @@ class _TakeAttendanceScreenState extends State<TakeAttendanceScreen> {
                                             color:
                                                 status ==
                                                     AttendanceStatus.present
-                                                ? const Color(0xFF16A34A)
+                                                ? MyColor.color16A34A
                                                 : Colors.transparent,
                                             borderRadius: BorderRadius.circular(
                                               8,
@@ -393,7 +393,7 @@ class _TakeAttendanceScreenState extends State<TakeAttendanceScreen> {
                                               color:
                                                   status ==
                                                       AttendanceStatus.present
-                                                  ? const Color(0xFF16A34A)
+                                                  ? MyColor.color16A34A
                                                   : MyColor.transparent,
                                             ),
                                           ),
@@ -423,7 +423,7 @@ class _TakeAttendanceScreenState extends State<TakeAttendanceScreen> {
                                             color:
                                                 status ==
                                                     AttendanceStatus.absent
-                                                ? const Color(0xFFE30B5C)
+                                                ? MyColor.colorE11D48
                                                 : Colors.transparent,
                                             borderRadius: BorderRadius.circular(
                                               8,
@@ -432,7 +432,7 @@ class _TakeAttendanceScreenState extends State<TakeAttendanceScreen> {
                                               color:
                                                   status ==
                                                       AttendanceStatus.absent
-                                                  ? const Color(0xFFE30B5C)
+                                                  ? MyColor.colorE11D48
                                                   : MyColor.transparent,
                                             ),
                                           ),
@@ -461,7 +461,7 @@ class _TakeAttendanceScreenState extends State<TakeAttendanceScreen> {
                                           decoration: BoxDecoration(
                                             color:
                                                 status == AttendanceStatus.leave
-                                                ? const Color(0xFFF59E0B)
+                                                ? MyColor.colorF59E0B
                                                 : Colors.transparent,
                                             borderRadius: BorderRadius.circular(
                                               8,
@@ -470,7 +470,7 @@ class _TakeAttendanceScreenState extends State<TakeAttendanceScreen> {
                                               color:
                                                   status ==
                                                       AttendanceStatus.leave
-                                                  ? const Color(0xFFF59E0B)
+                                                  ? MyColor.colorF59E0B
                                                   : MyColor.transparent,
                                             ),
                                           ),
