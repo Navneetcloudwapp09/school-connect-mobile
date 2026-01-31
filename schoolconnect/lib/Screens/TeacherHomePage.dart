@@ -326,6 +326,7 @@ class _TeacherHomePageState extends State<TeacherHomePage> {
     );
   }
 
+  // ignore: unused_element
   Widget _divider() {
     return Divider(color: Colors.blue.shade200, thickness: 1, height: 1);
   }
@@ -564,6 +565,7 @@ class _TeacherHomePageState extends State<TeacherHomePage> {
     );
   }
 
+  // ignore: unused_element
   Widget _subjectTile() {
     return Container(
       margin: const EdgeInsets.only(top: 12),
@@ -721,6 +723,7 @@ class _TeacherHomePageState extends State<TeacherHomePage> {
     );
   }
 
+  // ignore: unused_element
   Widget _classTile() {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),

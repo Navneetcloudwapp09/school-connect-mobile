@@ -1,5 +1,4 @@
 import 'dart:ui';
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:schoolconnect/export.dart';
 import 'package:schoolconnect/model.dart/teacherclass.dart';
@@ -16,8 +15,7 @@ class TakeAttendanceScreen extends StatefulWidget {
 class _TakeAttendanceScreenState extends State<TakeAttendanceScreen> {
   List<AttendanceStatus> _statuses = [];
   List<Student> _students = [];
-  List<AttendanceStatus>? _savedStatuses;
-  bool _isSaved = false;
+  // saved statuses removed (not used)
 
   void _setStatus(int index, AttendanceStatus status) {
     setState(() {
@@ -28,8 +26,7 @@ class _TakeAttendanceScreenState extends State<TakeAttendanceScreen> {
   }
 
   void _onSavePressed() {
-    _savedStatuses = List.from(_statuses);
-    _isSaved = true;
+    // persist or send attendance here when implemented
     _showSavedDialog();
   }
 
@@ -119,6 +116,7 @@ class _TakeAttendanceScreenState extends State<TakeAttendanceScreen> {
   }
 
   void _syncFromProvider() {
+    if (!mounted) return;
     final prov = context.read<TeacherProvider>();
     final students = prov.teacherClass?.students ?? [];
     // if same ids, no change
@@ -142,12 +140,15 @@ class _TakeAttendanceScreenState extends State<TakeAttendanceScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       // Fetch teacher class and attendance data
-      context.read<TeacherProvider>().fetchTeacherClass().then(
-        (_) => _syncFromProvider(),
-      );
+      final prov = context.read<TeacherProvider>();
+      prov.fetchTeacherClass().then((_) {
+        if (!mounted) return;
+        _syncFromProvider();
+      });
       // listen for future updates
-      context.read<TeacherProvider>().addListener(_syncFromProvider);
+      prov.addListener(_syncFromProvider);
     });
   }
 
@@ -155,7 +156,11 @@ class _TakeAttendanceScreenState extends State<TakeAttendanceScreen> {
   void dispose() {
     // remove provider listener
     try {
-      context.read<TeacherProvider>().removeListener(_syncFromProvider);
+      if (mounted) {
+        try {
+          context.read<TeacherProvider>().removeListener(_syncFromProvider);
+        } catch (_) {}
+      }
     } catch (_) {}
     super.dispose();
   }
