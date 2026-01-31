@@ -1,50 +1,25 @@
-import 'package:schoolconnect/export.dart';
+import 'dart:convert';
 
-class AttendanceHistoryScreen extends StatelessWidget {
+import 'package:schoolconnect/export.dart';
+import 'package:schoolconnect/model.dart/attendanceclass.dart';
+
+class AttendanceHistoryScreen extends StatefulWidget {
   const AttendanceHistoryScreen({super.key});
 
-  final List<Map<String, Object>> _records = const [
-    {
-      'date': 'Oct 24, 2025',
-      'day': 'Tuesday',
-      'present': 28,
-      'absent': 28,
-      'leave': 28,
-      'status': 'Complete',
-    },
-    {
-      'date': 'Oct 24, 2025',
-      'day': 'Tuesday',
-      'present': 28,
-      'absent': 4,
-      'leave': 0,
-      'status': 'Complete',
-    },
-    {
-      'date': 'Oct 24, 2025',
-      'day': 'Tuesday',
-      'present': 24,
-      'absent': 5,
-      'leave': 1,
-      'status': 'Complete',
-    },
-    {
-      'date': 'Oct 24, 2025',
-      'day': 'Monday',
-      'present': 0,
-      'absent': 0,
-      'leave': 0,
-      'status': 'Incomplete',
-    },
-    {
-      'date': 'Oct 24, 2025',
-      'day': 'Tuesday',
-      'present': 28,
-      'absent': 28,
-      'leave': 28,
-      'status': 'Complete',
-    },
-  ];
+  @override
+  State<AttendanceHistoryScreen> createState() =>
+      _AttendanceHistoryScreenState();
+}
+
+class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      debugPrint('AttendanceHistoryScreen: init - triggering fetchAttendance');
+      context.read<AttendanceProvider>().fetchAttendance();
+    });
+  }
 
   Widget _statusPill(String status) {
     final bool complete = status.toLowerCase() == 'complete';
@@ -58,12 +33,14 @@ class AttendanceHistoryScreen extends StatelessWidget {
           color: complete ? const Color(0xFF16A34A) : const Color(0xFFF59E0B),
         ),
       ),
-      child: Text(
-        status,
-        style: TextStyle(
-          color: complete ? const Color(0xFF16A34A) : const Color(0xFFF59E0B),
-          fontWeight: FontWeight.w600,
-          fontSize: 14,
+      child: Center(
+        child: Text(
+          status,
+          style: TextStyle(
+            color: complete ? const Color(0xFF16A34A) : const Color(0xFFF59E0B),
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
+          ),
         ),
       ),
     );
@@ -287,72 +264,144 @@ class AttendanceHistoryScreen extends StatelessWidget {
                     const Divider(height: 12, color: Color(0xFFEAF1FF)),
 
                     Expanded(
-                      child: ListView.separated(
-                        itemCount: _records.length,
-                        separatorBuilder: (context, index) =>
-                            const Divider(height: 12, color: Color(0xFFEAF1FF)),
-                        padding: const EdgeInsets.symmetric(vertical: 0),
+                      child: Consumer<AttendanceProvider>(
+                        builder: (context, prov, _) {
+                          if (prov.loading) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                          if (prov.error != null) {
+                            return Center(child: Text(prov.error!));
+                          }
+                          final list = prov.attendances;
+                          if (list.isEmpty) {
+                            return const Center(
+                              child: Text('No attendance records'),
+                            );
+                          }
 
-                        itemBuilder: (context, index) {
-                          final r = _records[index];
-                          final status = r['status'] as String;
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 15,
-                              vertical: 8,
+                          // Group attendances by date string
+                          final Map<String, List<AttendanceClass>> byDate = {};
+                          for (final a in list) {
+                            final d = a.date ?? '';
+                            byDate.putIfAbsent(d, () => []).add(a);
+                          }
+
+                          final dates = byDate.keys.toList()
+                            ..sort((a, b) => b.compareTo(a));
+
+                          return ListView.separated(
+                            itemCount: dates.length,
+                            separatorBuilder: (_, __) => const Divider(
+                              height: 12,
+                              color: Color(0xFFEAF1FF),
                             ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                            padding: const EdgeInsets.symmetric(vertical: 0),
+                            itemBuilder: (context, idx) {
+                              final dateKey = dates[idx];
+                              final dayGroup = byDate[dateKey]!;
+                              final students = dayGroup
+                                  .expand((e) => e.students ?? [])
+                                  .toList();
+
+                              final present = students
+                                  .where(
+                                    (s) => s.status?.toLowerCase() == 'present',
+                                  )
+                                  .length;
+                              final absent = students
+                                  .where(
+                                    (s) => s.status?.toLowerCase() == 'absent',
+                                  )
+                                  .length;
+                              final leave = students
+                                  .where(
+                                    (s) => s.status?.toLowerCase() == 'leave',
+                                  )
+                                  .length;
+
+                              String dayString = '';
+                              try {
+                                if (dateKey.isNotEmpty) {
+                                  final dt = DateTime.parse(dateKey);
+                                  const wk = [
+                                    'Monday',
+                                    'Tuesday',
+                                    'Wednesday',
+                                    'Thursday',
+                                    'Friday',
+                                    'Saturday',
+                                    'Sunday',
+                                  ];
+                                  dayString = wk[dt.weekday - 1];
+                                }
+                              } catch (_) {
+                                dayString = '';
+                              }
+
+                              final status =
+                                  dayGroup.first.status ?? 'Incomplete';
+
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 15,
+                                  vertical: 8,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                dateKey,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                              ),
+                                              _statusPill(status),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 2),
                                           Text(
-                                            r['date'] as String,
+                                            dayString,
                                             style: const TextStyle(
-                                              fontWeight: FontWeight.w700,
+                                              color: Colors.grey,
+                                              fontSize: 12,
                                             ),
                                           ),
-
-                                          _statusPill(status),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        r['day'] as String,
-                                        style: const TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 5),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          _countPill(
-                                            r['present'] as int,
-                                            r['absent'] as int,
-                                            r['leave'] as int,
-                                          ),
-                                          const Icon(
-                                            Icons.chevron_right,
-                                            color: MyColor.color737373,
-                                            size: 25,
+                                          const SizedBox(height: 5),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              _countPill(
+                                                present,
+                                                absent,
+                                                leave,
+                                              ),
+                                              const Icon(
+                                                Icons.chevron_right,
+                                                color: MyColor.color737373,
+                                                size: 25,
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
+                              );
+                            },
                           );
                         },
                       ),
